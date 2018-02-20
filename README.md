@@ -27,8 +27,6 @@ Check that you can instantiate the main class object:
 GameMechanicManager gmm = new GameMechanicManager(null,null);//Ignore the null for now
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
 
 ## Contributing
 
@@ -38,11 +36,6 @@ Please read [CONTRIBUTING.md](https://github.com/matan1905/GameMechanicManager/b
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/matan1905/GameMechanicManager/tags). 
 
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/matan1905/GameMechanicManager/contributors) who participated in this project.
 
 ## License
 
@@ -51,9 +44,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Inspiration
 Two main reasons I decided to build this library:
 
-1. Everytime I had a cool new idea for a game mechanic I had to build a whole game from almost scratch and the thought of implementing
+*  Everytime I had a cool new idea for a game mechanic I had to build a whole game from almost scratch and the thought of implementing
 so many mechanics (Especially for RPG games) really destroyed my motivation
 
-2.People have amazing ideas about very specific things(see mod communities for example), if we could make game mechanics modular
+* People have amazing ideas about very specific things(see mod communities for example), if we could make game mechanics modular
 enough, people could have an incredible inventory system or a quest system with just a few lines of codes, pushing all of their focus
 to whatever makes their game so great.
