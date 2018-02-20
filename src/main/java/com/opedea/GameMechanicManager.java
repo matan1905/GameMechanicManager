@@ -5,10 +5,14 @@ import com.opedea.mechanics.EventReceiver;
 import com.opedea.mechanics.GameMechanic;
 import com.opedea.mechanics.MechanicNotificationReceiver;
 import com.opedea.mechanics.Settings;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The main class that handles all of the game mechanics and their events
+ */
 public class GameMechanicManager {
 
     private long prevTime;//Used for ticks
@@ -23,34 +27,49 @@ public class GameMechanicManager {
     private Settings settings;
     private ArrayList<GameMechanic> mechanicList= new ArrayList<>();
 
-    /*
-    Datasource - a wrapper to a database of any sort
-    MechanicNotificationReciever - a receiving medium for mechanic induced events
+
+
+    /**
+     * creates a new instance of GameMechanicManager
+     * @param dataSource a wrapper to a database of any sort
+     * @param mechanicDrivenEventReceiver a receiving medium for mechanic induced events
      */
     public GameMechanicManager(DataSource dataSource, MechanicNotificationReceiver mechanicDrivenEventReceiver) {
        this(dataSource,mechanicDrivenEventReceiver,new Settings(dataSource));
     }
 
-    /*
-    Datasource - a wrapper to a database of any sort
-    MechanicNotificationReciever - a receiving medium for mechanic induced events
-    settings - a place that saves
+
+
+    /**
+     * creates a new instance of GameMechanicManager
+     * @param dataSource a wrapper to a database of any sort
+     * @param mechanicDrivenEventReceiver  a receiving medium for mechanic induced events
+     * @param settings a Setting object that responsible for settings
      */
     public GameMechanicManager(DataSource dataSource, MechanicNotificationReceiver mechanicDrivenEventReceiver,Settings settings) {
         this.dataSource = dataSource;
         this.mechanicNotificationReceiver = mechanicDrivenEventReceiver;
         this.settings=settings;
     }
-    //sends the notification, look at the interface for more details
+
+    /**
+     * sends a notification for more processing
+     * @param eventName identifier of a notification
+     * @param args any additional data
+     */
     public void sendNotification(String eventName, Object... args) {
         if (mechanicNotificationReceiver == null) return;
         mechanicNotificationReceiver.receive(eventName, args);
     }
 
-    /*
-    Fires an event, finds all suitable receivers to handle it.
+
+    /**
+     * Fires an event, finds all suitable receivers to handle it.
+     * @param eventName the event name
+     * @param callback a function that will be called if any response is needed
+     * @param arguments any additional data that the event might need
      */
-    public void fireEvent(String eventName, EventReceiver.Callback callback, Object... arguments) {
+    public void fireEvent(String eventName, @Nullable EventReceiver.Callback callback,@Nullable Object... arguments) {
 
         ArrayList<EventReceiver> listOfEvents = commonEventReceiver.get(eventName);
         if (listOfEvents != null) {
@@ -66,9 +85,13 @@ public class GameMechanicManager {
 
     }
 
-    /*
-    Fires an event in a different thread, be careful with the callback as it will be called from that different thread.
-    Make sure you read about thread safety and implement it properly before using this with a callback.
+
+    /**
+     * Fires an event in a different thread, be careful with the callback as it will be called from that different thread.
+     * Make sure you read about thread safety and implement it properly before using this with a callback.
+     * @param eventName the event name
+     * @param callback a function that will be called if any response is needed
+     * @param arguments any additional data that the event might need
      */
     public void fireEventAsnync(String eventName, EventReceiver.Callback callback, Object... arguments){
         new Thread(new Runnable() {
@@ -79,8 +102,10 @@ public class GameMechanicManager {
         }).run();
     }
 
-    /*
-    ticker for mechanics passage of time, calculating delta alone
+
+
+    /**
+     * ticker for mechanics passage of time, calculating delta alone
      */
     public void tick(){
         long newTime = System.currentTimeMillis();
@@ -90,45 +115,63 @@ public class GameMechanicManager {
         prevTime=newTime;
         tick(delta);
     }
-    /*
-    Ticker for mechanics passage of time, with delta provided.
-    Delta - how much time (in seconds) has passed since the last tick. first tick should be 0.
+
+
+    /**
+     * Ticker for mechanics passage of time, with delta provided.
+     * @param delta how much time (in seconds) has passed since the last tick. first tick should be 0.
      */
     public void tick(float delta){
         for (GameMechanic gameMechanic : mechanicList) {
             gameMechanic.tick(delta);
         }
     }
-    /*
-    registers a mechanic into the game
+
+    /**
+     * adds a mechanic to the game
+     * @param mechanic the mechanic added
      */
     public void addMechanic(GameMechanic mechanic) {
         mechanic.addedToGameMechanicManager(this,settings,dataSource);
         this.mechanicList.add(mechanic);
     }
-    /*
-    After changing a setting you probably want them to be changed in the mechanic object too.
-    Considering they don't always call getSetting, which is a bad practice
+
+
+    /**
+     * After changing a setting you probably want them to be changed in the mechanic object too.
+     * Considering they don't always call getSetting, which is a bad practice
      */
     public void refreshSettings(){
         for (GameMechanic gameMechanic : mechanicList) {
             gameMechanic.reloadSettings(settings);
         }
     }
-    /*
-    register a unique event handler (override previous)
+
+
+    /**
+     *  register a unique event handler (override previous)
+     * @param eventName event name  / identifier
+     * @param receiver the receiver of that event to add
      */
     public void registerReceiver(String eventName, EventReceiver receiver) {
         eventReceiver.put(eventName, receiver);
     }
 
+    /**
+     *
+     * @return Settings object
+     */
     public Settings getSettings() {
         return settings;
     }
 
-    /*
-        register a common event handler (append to previous)
-         */
+
+
+    /**
+     * register a common event handler (append to previous)
+     * @param eventName event name  / identifier
+     * @param receiver the receiver of that event to add
+     */
     public void registerCommonReceiver(String eventName, EventReceiver receiver) {
         if (commonEventReceiver.get(eventName) == null) {
             commonEventReceiver.put(eventName,new ArrayList<>());
