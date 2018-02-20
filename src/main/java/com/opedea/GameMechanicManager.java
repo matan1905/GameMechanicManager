@@ -122,9 +122,13 @@ public class GameMechanicManager {
         eventReceiver.put(eventName, receiver);
     }
 
+    public Settings getSettings() {
+        return settings;
+    }
+
     /*
-    register a common event handler (append to previous)
-     */
+        register a common event handler (append to previous)
+         */
     public void registerCommonReceiver(String eventName, EventReceiver receiver) {
         if (commonEventReceiver.get(eventName) == null) {
             commonEventReceiver.put(eventName,new ArrayList<>());
