@@ -5,7 +5,8 @@ You could also download other people's mechanics and use them to quickly prototy
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will help you integrating this project into your game.
+After you have, check out the [Wiki](https://github.com/matan1905/GameMechanicManager/wiki) for more information
 
 ### Prerequisites
 
