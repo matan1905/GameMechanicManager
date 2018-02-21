@@ -35,6 +35,21 @@ public abstract class DataSource implements Settings.SettingSaver {
      */
     public abstract <T extends Model> T findById(Class<T> type, String id);
 
+    /**
+     * Checks if the datasoruce uses the additional sql queries in deleteAll and find
+     * @return can you run additional sql queries (where, order, limit).
+     *
+     */
+    public abstract boolean SupportFindQueries();
+
+    /**
+     * Runs a full query if supported
+     * @param query the query to run
+     * @return query success or failure, defaults for false.
+     */
+    public boolean query(String query){
+        return false;
+    }
 
     /**
      *  Using reflection to manually add.
