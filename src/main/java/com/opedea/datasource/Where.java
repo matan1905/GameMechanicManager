@@ -2,8 +2,18 @@ package com.opedea.datasource;
 
 import java.util.ArrayList;
 
+/**
+ * Class that handles all the where clauses in a simple manner for both sides
+ */
 public class Where {
     private ArrayList<ArrayList<Clause>> whereClauses= new ArrayList<>();
+
+    /**
+     * adds one or more clauses to the where
+     * @param orClauses a list of clauses seperated by OR
+     * @see Clause
+     * @return the object, for chaining purposes.
+     */
     public Where or(Clause... orClauses){
         for (Clause clause : orClauses) {
             ArrayList<Clause> andClause = new ArrayList<>();
@@ -55,6 +65,9 @@ public class Where {
         return sb.toString();
     }
 
+    /**
+     * Helper class to explain a single boolean expression
+     */
     public static class Clause{
         private final String left;
         private final String right;
@@ -71,42 +84,103 @@ public class Where {
             return prev!=null;
         }
 
+        /**
+         *
+         * @return the left part of a boolean expression (left == right)
+         */
         public String getLeft() {
             return left;
         }
 
+        /**
+         *
+         * @return the right part of a boolean expression (left == right)
+         */
         public String getRight() {
             return right;
         }
 
+        /**
+         *
+         * @return the type of the boolean expression (the 'middle' part, left == right)
+         */
         public Type getType() {
             return type;
         }
 
+        /**
+         * chain another clause in an AND relationship
+         * @param next the clause to chain
+         * @return the clause chained
+         */
         public Clause and(Clause next){
             next.prev=this;
             return next;
         }
+
+        /**
+         * Creates a clause of less than type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause lt(String left, String right){
             return new Clause(left,right,Type.LESS_THAN);
         }
+
+        /**
+         * Creates a clause of greater than type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause gt(String left,String right){
             return new Clause(left,right,Type.GREATER_THAN);
         }
+
+        /**
+         * Creates a clause of greater than or equal to type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause gte(String left,String right){
             return new Clause(left,right,Type.GREATER_THAN_OR_EQUAL_TO);
         }
+
+        /**
+         * Creates a clause of less than or equal to type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause lte(String left,String right){
             return new Clause(left,right,Type.LESS_THAN_OR_EQUAL_TO);
         }
+
+        /**
+         * Creates a clause of equal type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause eq(String left,String right){
             return new Clause(left,right,Type.EQUAL_TO);
         }
 
+        /**
+         * Creates a clause of not equal type boolean expression
+         * @param left left part of boolean expression, a field of a model
+         * @param right right part of a boolean expression,
+         * @return Clause representing this boolean expression
+         */
         public static Clause neq(String left,String right){
             return new Clause(left,right,Type.NOT_EQUAL_TO);
         }
 
+        /**
+         * All the supported comparisons 
+         */
         enum Type{
             LESS_THAN,GREATER_THAN,EQUAL_TO,LESS_THAN_OR_EQUAL_TO, NOT_EQUAL_TO, GREATER_THAN_OR_EQUAL_TO;
 
