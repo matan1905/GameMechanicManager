@@ -39,6 +39,7 @@ public abstract class GameMechanic {
      * Load all of the datasource models you have
      * Example usage (where item is a model):
      * datasource.addModel(Item.class);
+     * Use of prefix in the model is advised.
      * @param dataSource
      */
     protected abstract void loadModels(DataSource dataSource);

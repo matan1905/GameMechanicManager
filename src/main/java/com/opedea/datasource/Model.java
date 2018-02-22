@@ -24,7 +24,7 @@ public class Model {
      * @return a list of T models
      */
     public static <T extends Model> List<T> findAll(Class<T> type){
-        return dataSource.find( type, null, null, null, null);
+        return dataSource.find( type, null, null, 0);
     }
 
     /**
@@ -33,12 +33,11 @@ public class Model {
      * List<Items> items =Items.find(Items.class,"quantity>?",new String[]{"1"});
      * @param type class of the model to find
      * @param where where clauses
-     * @param whereArgs where arguments
      * @param <T> the model to find
      * @return list of models
      */
-    public static <T extends Model> List<T> find(Class<T> type,String where,String[] whereArgs){
-        return dataSource.find( type, where, whereArgs, null, null);
+    public static <T extends Model> List<T> find(Class<T> type,Where where){
+        return dataSource.find( type, where, null, 0);
     }
 
     /**
@@ -47,14 +46,13 @@ public class Model {
      * List<Items> items =Items.find(Items.class,"quantity>?",new String[]{"1"},"name","100");
      * @param type class of the model to find
      * @param where where clauses
-     * @param whereArgs where arguments
      * @param orderBy a field in the model to order by it
      * @param limit maximum amount of items in the returned list
      * @param <T> the model type
      * @return list of models
      */
-    public static <T extends Model> List<T> find(Class<T> type,String where,String[] whereArgs ,String orderBy,String limit){
-        return dataSource.find( type, where, whereArgs, orderBy, limit);
+    public static <T extends Model> List<T> find(Class<T> type,Where where ,String orderBy,int limit){
+        return dataSource.find( type, where, orderBy, limit);
     }
 
     /**

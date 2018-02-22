@@ -1,6 +1,8 @@
 package com.opedea.datasource;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,13 +19,74 @@ public class MemoryHashmapMapDataSource extends DataSource{
         memory = new HashMap<>();
         settings= new HashMap<>();
     }
+
     @Override
-    public <T extends Model> List<T> find(Class<T> aClass, String s, String[] strings, String s1, String s2) {
+    public <T extends Model> List<T> find(Class<T> type, Where where, String orderBy, int limit) {
         ArrayList<T> list = new ArrayList<>();
-        //a terrible way but it's just for testing amrite
-        for (Model model : memory.get(aClass.getSimpleName())) {
-            list.add((T)model);
+        int counter=0;
+        for (Model model : memory.get(type.getSimpleName())) {
+            boolean orToAdd=false;
+            if(where !=null)
+            for (ArrayList<Where.Clause> clauses : where.getWhereClauses()) {
+                boolean andToAdd=true;
+                for (Where.Clause clause : clauses) {
+                    //andToAdd &= result of this clause
+                    try {
+                        Field leftF = type.getDeclaredField(clause.getLeft());
+                        String leftType = leftF.getType().getSimpleName();
+                        Object right;
+                        if(leftType.equals("Integer")){
+                            right = Integer.parseInt(clause.getRight());
+                        }else if(leftType.equals("Float")){
+                            right=Float.parseFloat(clause.getRight()) ;
+
+                        }else if(leftType.equals("Double")){
+                            right=Double.parseDouble(clause.getRight()) ;
+
+                        }else if(leftType.equals("Boolean")){
+                            right=Boolean.parseBoolean(clause.getRight()) ;
+                        }
+                        else{
+                            right=clause.getRight();
+                        }
+                        leftF.setAccessible(true);
+                        int result =((Comparable)leftF.get(model)).compareTo(right);
+
+                        switch (clause.getType()){
+                            case EQUAL_TO:andToAdd&= (result==0); break;
+                            case LESS_THAN:andToAdd&= (result<0);break;
+                            case GREATER_THAN:andToAdd&= (result>0);break;
+                            case NOT_EQUAL_TO:andToAdd&= (result!=0);break;
+                            case LESS_THAN_OR_EQUAL_TO:andToAdd&= (result<=0);break;
+                            case GREATER_THAN_OR_EQUAL_TO:andToAdd&= (result>=0);break;
+                        }
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }
+                orToAdd |= andToAdd;
+            }
+            if(orToAdd || where==null) {
+                list.add((T)model);
+                counter++;
+            }
+            if(counter>limit && limit!=0) break;
         }
+        list.sort(new Comparator<T>() {
+            @Override
+            public int compare(T o1, T o2) {
+                try {
+                    Field o1Field =o1.getClass().getDeclaredField(orderBy);
+                    o1Field.setAccessible(true);
+                    Field o2Field =o2.getClass().getDeclaredField(orderBy);
+                    o2Field.setAccessible(true);
+                    return ((Comparable)o1Field.get(o1)).compareTo(o2Field.get(o2));
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        });
         return list;
     }
 
@@ -34,16 +97,14 @@ public class MemoryHashmapMapDataSource extends DataSource{
         }
         return null;
     }
-
-    @Override
-    public boolean SupportFindQueries() {
-        return false;
-    }
-
     @Override
     public <T extends Model> void addModel(Class<T> modelClass) {
         super.addModel(modelClass);
         memory.put(modelClass.getSimpleName(),new ArrayList<>());
+    }
+
+    @Override
+    public <T> void ensureIndex(Class<T> type, String index) {
     }
 
     @Override
