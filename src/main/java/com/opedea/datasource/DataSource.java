@@ -61,16 +61,16 @@ public abstract class DataSource implements Settings.SettingSaver {
          * @param <T> any model
          */
     public  <T extends Model> void addModel(Class<T> modelClass,String... indexes){
-        if (indexes != null) {
-            for (String index : indexes) {
-                ensureIndex(modelClass,index);
-            }
-        }
         try {
             Method method = modelClass.getMethod("setDataSource", DataSource.class);
             method.invoke(null,this);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if (indexes != null) {
+            for (String index : indexes) {
+                ensureIndex(modelClass, index);
+            }
         }
     }
 
@@ -102,10 +102,10 @@ public abstract class DataSource implements Settings.SettingSaver {
     /**
      * delete all models using a where query
      * @param type the class of the deleted model
-     * @param where any specific where filters, Usage example: "size > ?" where ? is argument
-     * @param whereArgs replaces every ? in the whereClause by the appropriate argument
+     * @param where any specific where filters
+     * @see Where
      */
-    public abstract  <T extends Model>  void deleteAll(Class<T> type,String where, String[] whereArgs);
+    public abstract  <T extends Model>  void deleteAll(Class<T> type,Where where);
 
 
 }

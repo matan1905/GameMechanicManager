@@ -78,6 +78,7 @@ public class Model {
      */
     public void delete(){
         dataSource.delete(this);
+        setId(null);
     }
 
     /**
@@ -85,10 +86,10 @@ public class Model {
      * Example Item.deleteAll(Item.class,"name =?",new String[]{"Super sword"})
      * @param type The type of model to delete
      * @param where where clauses
-     * @param whereArgs where arguments
+     * @see Where
      */
-    public static <T extends Model> void deleteAll(Class<T> type,String where,String[] whereArgs){
-        dataSource.deleteAll(type,where,whereArgs);
+    public static <T extends Model> void deleteAll(Class<T> type,Where where){
+        dataSource.deleteAll(type,where);
     }
 
     /**
